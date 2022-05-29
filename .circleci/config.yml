@@ -20,6 +20,14 @@ jobs:
           name: Set Version
           command: |
                 echo 'export VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)' >> $BASH_ENV
+      - run:
+          name: echo PWD
+          command: |
+                echo $PWD
+      - run:
+          name: Change directory
+          command: |
+                cd ./getting-started
       ## Restore any files that may have been cached from previous jobs
       - restore_cache:
           keys:
