@@ -22,9 +22,9 @@ jobs:
           command: |
                 echo 'export VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)' >> $BASH_ENV
       - run:
-          name: echo PWD
+          name: Show 'ls -la' 
           command: |
-                echo $PWD
+                ls -la
       ## Restore any files that may have been cached from previous jobs
       - restore_cache:
           keys:
