@@ -15,7 +15,7 @@ jobs:
     steps:
       ## Checkout the source code
       - checkout:
-          path: ~/getting-started
+          path: ~/Quarkus-app
     ## set the version
       - run:
           name: Set Version
