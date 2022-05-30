@@ -7,14 +7,15 @@ jobs:
       image: ubuntu-2004:202008-01
     ## Uses a "medium" sized machine (this is the default) - maybe increase this to "large" if you pay for CircleCI
     resource_class: medium
-    working_directory: ~/repo
+    working_directory: ~/Quarkus-app/getting-started
     environment:
       MAVEN_OPTS: -Xmx6400m
       # Set the GRAALVM_HOME env variable to the location where we will be installing GraalVM
       GRAALVM_HOME: /home/circleci/repo/.graalvm
     steps:
       ## Checkout the source code
-      - checkout
+      - ckeckout:
+          path: ~/Quarkus-app          
     ## set the version
       - run:
           name: Set Version
