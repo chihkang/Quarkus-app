@@ -14,7 +14,7 @@ jobs:
       GRAALVM_HOME: /home/circleci/repo/.graalvm
     steps:
       ## Checkout the source code
-      - ckeckout
+      - checkout
           ##path: ~/Quarkus-app
     ## set the version
       - run:
