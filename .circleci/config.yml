@@ -36,7 +36,7 @@ jobs:
       ## Note. we can't just run mvn dependency:go-offline as the jars in the sub modules won't have been built yet
       - run:
           name: Build
-          command: ./mvnw clean install -Pnative -Dquarkus.native.container-build=true -Dmaven.test.skip 
+          command: ./mvnw clean install
             #mvn clean install -DskipTests
 
       ## cache the dependencies
