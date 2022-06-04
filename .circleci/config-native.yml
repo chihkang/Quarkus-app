@@ -1,0 +1,63 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: cimg/openjdk:11.0.13         
+    working_directory: ~/Quarkus-app/getting-started
+    environment:
+      MAVEN_OPTS: -Xmx6400m
+    steps:
+      ## Checkout the source code
+      - checkout:
+          path: ~/Quarkus-app
+      - setup_remote_docker:
+          docker_layer_caching: true # DLC will explicitly cache layers here and try to avoid rebuilding.
+      - run:
+          name: Set Version
+          command: |
+                echo 'export VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)' >> $BASH_ENV
+                echo $BASH_ENV
+      # Install GraalVM and native-image, needed for a native Quarkus build
+      # ########################
+      # - run:
+      #     name: Install gcc-c++
+      #     command: |
+      #         if [ "${CIRCLE_BRANCH}" == "master" ]; then
+      #             apt install g++ zlib1g-dev libfreetype6-dev
+      #         fi
+      - run:
+          name: Install GraalVM
+          command: |
+              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                  curl https://github.com/graalvm/mandrel/releases/download/mandrel-22.1.0.0-Final/mandrel-java11-linux-amd64-22.1.0.0-Final.tar.gz -O -J -L && tar -xf mandrel-java11-linux-amd64-22.1.0.0-Final.tar.gz && export JAVA_HOME="$( pwd )/mandrel-java11-22.1.0.0-Final" && export GRAALVM_HOME="${JAVA_HOME}" && export PATH="${JAVA_HOME}/bin:${PATH}"
+              fi
+      - run:
+          name: Install native-image
+          command: |
+              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                $GRAALVM_HOME/bin/gu install native-image
+              fi
+      # Perform a native Quarkus build and verify
+      # ########################
+      - run:
+          name: Build (Native)
+          command: |
+              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                mvn clean package -Pnative -DskipTests -Dquarkus.native.native-image-xmx=8g -Dquarkus.container-image.tag=${VERSION}-native
+              fi
+          no_output_timeout: 30m
+      - run:
+          name: Build (Native)
+          command: |
+              if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                docker build -f src/main/docker/Dockerfile.native -t chihkang/quarkus-quickstart:${VERSION}-native .
+              fi
+          no_output_timeout: 30m
+      - run:
+          name: Docker Push (Native)
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                echo $DOCKER_PWD | docker login -u $DOCKER_USER --password-stdin               
+                docker push chihkang/quarkus-quickstart:${VERSION}-native
+                docker logout
+            fi            

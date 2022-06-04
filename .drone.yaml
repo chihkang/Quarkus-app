@@ -1,0 +1,17 @@
+kind: pipeline
+type: kubernetes
+name: default
+
+steps:
+- name: docker  
+  image: plugins/docker
+  settings:
+    repo: chihkang/quarkus-quickstart
+    tags:
+    - latest
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+    dry_run: true
+    dockerfile: Dockerfile.multistage
